@@ -1,0 +1,928 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+  <title>Dashboard - Gestor Financeiro</title>
+  <meta name="description" content="Painel de controle do Gestor Financeiro.">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <main class="dashboard">
+
+    <!-- =========================================================
+         CABEÇALHO
+    ========================================================== -->
+
+    <header class="dashboard-header">
+      <div>
+        <h1>Painel financeiro</h1>
+
+        <p id="nome-usuario">
+          Carregando usuário...
+        </p>
+      </div>
+
+      <button
+        id="botao-sair"
+        type="button"
+      >
+        Sair
+      </button>
+    </header>
+
+
+    <!-- =========================================================
+         RESUMO GERAL
+    ========================================================== -->
+
+    <section class="cards-resumo">
+      <article class="card-resumo">
+        <span>Saldo atual</span>
+
+        <strong id="saldo-atual">
+          R$ 0,00
+        </strong>
+      </article>
+
+      <article class="card-resumo">
+        <span>Total de entradas</span>
+
+        <strong id="total-entradas">
+          R$ 0,00
+        </strong>
+      </article>
+
+      <article class="card-resumo">
+        <span>Total de saídas</span>
+
+        <strong id="total-saidas">
+          R$ 0,00
+        </strong>
+      </article>
+
+      <article class="card-resumo">
+        <span>Contas pendentes</span>
+
+        <strong id="contas-pendentes">
+          R$ 0,00
+        </strong>
+      </article>
+    </section>
+
+    <!-- =========================================================
+         GERENCIAMENTO DE CONTAS
+    ========================================================== -->
+
+    <section class="secao-financeira">
+      <div class="titulo-secao">
+        <div>
+          <h2>Gerenciamento de contas</h2>
+
+          <p>
+            Cadastre, edite e controle as contas financeiras.
+          </p>
+        </div>
+      </div>
+
+
+      <form
+        id="form-conta"
+        class="formulario-lancamento"
+      >
+        <div class="campo">
+          <label for="nome-conta">
+            Nome da conta
+          </label>
+
+          <input
+            id="nome-conta"
+            type="text"
+            maxlength="120"
+            placeholder="Ex.: Caixa principal"
+            required
+          >
+        </div>
+
+
+        <div class="campo">
+          <label for="tipo-conta">
+            Tipo da conta
+          </label>
+
+          <input
+            id="tipo-conta"
+            type="text"
+            maxlength="40"
+            placeholder="Ex.: caixa, banco ou carteira"
+            required
+          >
+        </div>
+
+
+        <div class="campo">
+          <label for="saldo-inicial-conta">
+            Saldo inicial
+          </label>
+
+          <input
+            id="saldo-inicial-conta"
+            type="text"
+            inputmode="decimal"
+            value="0,00"
+            placeholder="Ex.: 1.500,00"
+            required
+          >
+        </div>
+
+
+        <div class="acoes-formulario">
+          <button
+            id="botao-salvar-conta"
+            class="botao-principal"
+            type="submit"
+          >
+            Cadastrar conta
+          </button>
+
+          <button
+            id="botao-cancelar-edicao-conta"
+            class="botao-secundario"
+            type="button"
+            hidden
+          >
+            Cancelar edição
+          </button>
+
+          <p
+            id="mensagem-conta"
+            class="mensagem-formulario"
+          ></p>
+        </div>
+      </form>
+
+
+      <div class="tabela-wrapper">
+        <table
+          class="tabela-lancamentos tabela-gerenciamento-contas"
+        >
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Tipo</th>
+              <th>Saldo inicial</th>
+              <th>Entradas</th>
+              <th>Saídas</th>
+              <th>Saldo atual</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+
+          <tbody id="lista-gerenciamento-contas">
+            <tr>
+              <td
+                colspan="8"
+                class="tabela-vazia"
+              >
+                Carregando contas...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         GERENCIAMENTO DE USUÁRIOS
+    ========================================================== -->
+
+    <section id="gerenciamento-usuarios" class="secao-financeira">
+        <div class="titulo-secao">
+            <div>
+                <h2>Gerenciamento de usuários</h2>
+                <p>
+                    Cadastre, edite e controle os usuários do sistema.
+                </p>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Cadastrar / Editar Usuário</h3>
+            <form id="form-usuario" class="formulario-lancamento">
+                <div class="campo">
+                    <label for="nome-usuario-form">Nome:</label>
+                    <input type="text" id="nome-usuario-form" maxlength="120" placeholder="Ex.: João da Silva" required>
+                </div>
+                <div class="campo">
+                    <label for="email-usuario-form">E-mail:</label>
+                    <input type="email" id="email-usuario-form" maxlength="120" placeholder="Ex.: joao@exemplo.com" required>
+                </div>
+                <div class="campo">
+                    <label for="senha-usuario-form">Senha:</label>
+                    <input type="password" id="senha-usuario-form" placeholder="Deixe em branco para não alterar">
+                </div>
+                <div class="campo">
+                    <label for="perfil-usuario-form">Perfil:</label>
+                    <select id="perfil-usuario-form" required>
+                        <option value="usuario">Usuário Comum</option>
+                        <option value="administrador">Administrador</option>
+                    </select>
+                </div>
+                <div class="acoes-formulario">
+                    <button type="submit" id="botao-salvar-usuario" class="botao-principal">Cadastrar Usuário</button>
+                    <button type="button" id="botao-cancelar-edicao-usuario" class="botao-secundario" hidden>Cancelar Edição</button>
+                    <p id="mensagem-usuario" class="mensagem-formulario"></p>
+                </div>
+            </form>
+        </div>
+
+        <div class="card mt-4">
+            <h3>Lista de Usuários</h3>
+            <div class="tabela-wrapper">
+                <table class="tabela-lancamentos tabela-gerenciamento-usuarios">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>E-mail</th>
+                            <th>Perfil</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lista-usuarios">
+                        <!-- Usuários serão carregados aqui pelo JavaScript -->
+                        <tr>
+                            <td colspan="4" class="tabela-vazia">Carregando usuários...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- =========================================================
+         NOVO LANÇAMENTO
+    ========================================================== -->
+
+    <section class="secao-financeira">
+      <div class="titulo-secao">
+        <div>
+          <h2>Novo lançamento</h2>
+
+          <p>
+            Registre entradas e saídas financeiras.
+          </p>
+        </div>
+      </div>
+
+
+      <form
+        id="form-lancamento"
+        class="formulario-lancamento"
+      >
+        <div class="campo">
+          <label for="tipo-lancamento">
+            Tipo
+          </label>
+
+          <select
+            id="tipo-lancamento"
+            required
+          >
+            <option value="entrada">
+              Entrada
+            </option>
+
+            <option value="saida">
+              Saída
+            </option>
+          </select>
+        </div>
+
+
+        <div class="campo">
+          <label for="descricao-lancamento">
+            Descrição
+          </label>
+
+          <input
+            id="descricao-lancamento"
+            type="text"
+            maxlength="120"
+            placeholder="Ex.: Oferta do culto"
+            required
+          >
+        </div>
+
+
+        <div class="campo">
+          <label for="valor-lancamento">
+            Valor
+          </label>
+
+          <input
+            id="valor-lancamento"
+            type="text"
+            inputmode="decimal"
+            placeholder="Ex.: 150,00"
+            required
+          >
+        </div>
+
+
+        <div class="campo">
+          <label for="data-lancamento">
+            Data
+          </label>
+
+          <input
+            id="data-lancamento"
+            type="date"
+            required
+          >
+        </div>
+
+
+        <div class="campo">
+          <label for="categoria-lancamento">
+            Categoria
+          </label>
+
+          <select id="categoria-lancamento">
+            <option value="">
+              Sem categoria
+            </option>
+          </select>
+        </div>
+
+
+        <div class="campo">
+          <label for="conta-lancamento">
+            Conta
+          </label>
+
+          <select
+            id="conta-lancamento"
+            required
+          >
+            <option value="">
+              Carregando contas...
+            </option>
+          </select>
+        </div>
+
+
+        <div class="campo campo-largo">
+          <label for="observacao-lancamento">
+            Observação
+          </label>
+
+          <textarea
+            id="observacao-lancamento"
+            maxlength="500"
+            placeholder="Observação opcional"
+          ></textarea>
+        </div>
+
+
+        <div class="acoes-formulario">
+          <button
+            id="botao-salvar-lancamento"
+            class="botao-principal"
+            type="submit"
+          >
+            Salvar lançamento
+          </button>
+
+          <p
+            id="mensagem-lancamento"
+            class="mensagem-formulario"
+          ></p>
+        </div>
+      </form>
+    </section>
+
+
+    <!-- =========================================================
+         LANÇAMENTOS RECENTES
+         Sem coluna de ações/excluir
+    ========================================================== -->
+
+    <section class="secao-financeira">
+      <div class="titulo-secao">
+        <div>
+          <h2>Lançamentos recentes</h2>
+
+          <p>
+            Últimos registros financeiros cadastrados.
+          </p>
+        </div>
+      </div>
+
+
+      <div class="tabela-wrapper">
+        <table
+          class="tabela-lancamentos tabela-recentes"
+        >
+          <thead>
+            <tr>
+              <th>Tipo</th>
+              <th>Descrição</th>
+              <th>Valor</th>
+              <th>Observação</th>
+              <th>Categoria</th>
+              <th>Data</th>
+              <th>Conta</th>
+            </tr>
+          </thead>
+
+          <tbody id="lista-lancamentos">
+            <tr>
+              <td
+                colspan="7"
+                class="tabela-vazia"
+              >
+                Carregando lançamentos...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+
+    <!-- =========================================================
+         NOVA CONTA A PAGAR
+    ========================================================== -->
+
+    <section class="secao-financeira">
+      <div class="titulo-secao">
+        <div>
+          <h2>Nova conta a pagar</h2>
+
+          <p>
+            Cadastre despesas futuras.
+          </p>
+        </div>
+      </div>
+
+
+      <form
+        id="form-conta-pagar"
+        class="formulario-lancamento"
+      >
+        <div class="campo">
+          <label for="descricao-conta-pagar">
+            Descrição
+          </label>
+
+          <input
+            id="descricao-conta-pagar"
+            type="text"
+            maxlength="120"
+            placeholder="Ex.: Conta de energia"
+            required
+          >
+        </div>
+
+
+        <div class="campo">
+          <label for="valor-conta-pagar">
+            Valor
+          </label>
+
+          <input
+            id="valor-conta-pagar"
+            type="text"
+            inputmode="decimal"
+            placeholder="Ex.: 350,00"
+            required
+          >
+        </div>
+
+
+        <div class="campo">
+          <label for="vencimento-conta-pagar">
+            Vencimento
+          </label>
+
+          <input
+            id="vencimento-conta-pagar"
+            type="date"
+            required
+          >
+        </div>
+
+
+        <div class="campo">
+          <label for="categoria-conta-pagar">
+            Categoria
+          </label>
+
+          <select id="categoria-conta-pagar">
+            <option value="">
+              Sem categoria
+            </option>
+          </select>
+        </div>
+
+
+        <div class="campo">
+          <label for="conta-conta-pagar">
+            Conta para pagamento
+          </label>
+
+          <select
+            id="conta-conta-pagar"
+            required
+          >
+            <option value="">
+              Carregando contas...
+            </option>
+          </select>
+        </div>
+
+
+        <div class="campo campo-largo">
+          <label for="observacao-conta-pagar">
+            Observação
+          </label>
+
+          <textarea
+            id="observacao-conta-pagar"
+            maxlength="500"
+            placeholder="Observação opcional"
+          ></textarea>
+        </div>
+
+
+        <div class="acoes-formulario">
+          <button
+            id="botao-salvar-conta-pagar"
+            class="botao-principal"
+            type="submit"
+          >
+            Salvar conta
+          </button>
+
+          <p
+            id="mensagem-conta-pagar"
+            class="mensagem-formulario"
+          ></p>
+        </div>
+      </form>
+    </section>
+
+
+    <!-- =========================================================
+         CONTAS A PAGAR
+    ========================================================== -->
+
+    <section class="secao-financeira">
+      <div class="titulo-secao">
+        <div>
+          <h2>Contas a pagar</h2>
+
+          <p>
+            Contas pendentes, pagas e canceladas.
+          </p>
+        </div>
+      </div>
+
+
+      <div class="filtros-contas">
+        <div class="campo">
+          <label for="filtro-status-contas">
+            Status
+          </label>
+
+          <select id="filtro-status-contas">
+            <option value="">
+              Todos os status
+            </option>
+
+            <option value="pendente">
+              Pendentes
+            </option>
+
+            <option value="paga">
+              Pagas
+            </option>
+
+            <option value="cancelada">
+              Canceladas
+            </option>
+          </select>
+        </div>
+
+
+        <div class="campo">
+          <label for="filtro-busca-contas">
+            Buscar descrição
+          </label>
+
+          <input
+            id="filtro-busca-contas"
+            type="search"
+            placeholder="Ex.: conta de energia"
+          >
+        </div>
+      </div>
+
+
+      <div class="tabela-wrapper">
+        <table
+          class="tabela-lancamentos tabela-contas-pagar"
+        >
+          <thead>
+            <tr>
+              <th>Vencimento</th>
+              <th>Descrição</th>
+              <th>Observação</th>
+              <th>Categoria</th>
+              <th>Conta</th>
+              <th>Status</th>
+              <th>Valor</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+
+          <tbody id="lista-contas-pagar">
+            <tr>
+              <td
+                colspan="8"
+                class="tabela-vazia"
+              >
+                Carregando contas...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- =========================================================
+     RELATÓRIO FINANCEIRO
+========================================================== -->
+
+<section
+  id="secao-relatorios"
+  class="secao-financeira secao-relatorios"
+>
+  <div class="titulo-secao">
+    <div>
+      <h2>Relatório financeiro</h2>
+
+      <p>
+        Consulte lançamentos por período, conta e categoria.
+      </p>
+    </div>
+
+    <div class="acoes-relatorio">
+      <button
+        id="botao-gerar-relatorio"
+        class="botao-principal"
+        type="button"
+      >
+        Gerar relatório
+      </button>
+
+      <button
+        id="botao-imprimir-relatorio"
+        class="botao-secundario"
+        type="button"
+        disabled
+      >
+        Imprimir / Salvar PDF
+      </button>
+    </div>
+  </div>
+
+  <form
+    id="form-filtros-relatorio"
+    class="formulario-relatorio"
+  >
+    <div class="campo">
+      <label for="relatorio-data-inicio">
+        Data inicial
+      </label>
+
+      <input
+        id="relatorio-data-inicio"
+        type="date"
+      >
+    </div>
+
+    <div class="campo">
+      <label for="relatorio-data-fim">
+        Data final
+      </label>
+
+      <input
+        id="relatorio-data-fim"
+        type="date"
+      >
+    </div>
+
+    <div class="campo">
+      <label for="relatorio-tipo">
+        Tipo
+      </label>
+
+      <select id="relatorio-tipo">
+        <option value="">
+          Entradas e saídas
+        </option>
+
+        <option value="entrada">
+          Apenas entradas
+        </option>
+
+        <option value="saida">
+          Apenas saídas
+        </option>
+      </select>
+    </div>
+
+    <div class="campo">
+      <label for="relatorio-conta">
+        Conta
+      </label>
+
+      <select id="relatorio-conta">
+        <option value="">
+          Todas as contas
+        </option>
+      </select>
+    </div>
+
+    <div class="campo">
+      <label for="relatorio-categoria">
+        Categoria
+      </label>
+
+      <select id="relatorio-categoria">
+        <option value="">
+          Todas as categorias
+        </option>
+      </select>
+    </div>
+
+    <div class="acoes-formulario">
+      <button
+        class="botao-secundario"
+        id="botao-limpar-filtros"
+        type="button"
+      >
+        Limpar filtros
+      </button>
+    </div>
+  </form>
+
+  <div
+    id="relatorio-impressao"
+    class="relatorio-impressao"
+  >
+    <header class="cabecalho-relatorio">
+      <div>
+        <h3>Gestor Financeiro</h3>
+        <p>Relatório de lançamentos financeiros</p>
+      </div>
+
+      <div class="informacoes-relatorio">
+        <span>
+          Emitido em:
+          <strong id="relatorio-data-emissao">
+            —
+          </strong>
+        </span>
+
+        <span>
+          Período:
+          <strong id="relatorio-periodo">
+            Todos os períodos
+          </strong>
+        </span>
+      </div>
+    </header>
+
+    <section class="cards-relatorio">
+      <article class="card-relatorio card-entradas">
+        <span>Total de entradas</span>
+
+        <strong id="relatorio-total-entradas">
+          R$ 0,00
+        </strong>
+      </article>
+
+      <article class="card-relatorio card-saidas">
+        <span>Total de saídas</span>
+
+        <strong id="relatorio-total-saidas">
+          R$ 0,00
+        </strong>
+      </article>
+
+      <article class="card-relatorio card-saldo">
+        <span>Saldo do período</span>
+
+        <strong id="relatorio-saldo">
+          R$ 0,00
+        </strong>
+      </article>
+
+      <article class="card-relatorio">
+        <span>Lançamentos encontrados</span>
+
+        <strong id="relatorio-quantidade">
+          0
+        </strong>
+      </article>
+    </section>
+
+    <div class="resumo-filtros">
+      <span>
+        Filtros aplicados:
+      </span>
+
+      <strong id="relatorio-filtros-aplicados">
+        Nenhum filtro
+      </strong>
+    </div>
+
+    <div class="tabela-wrapper">
+      <table class="tabela-lancamentos tabela-relatorio">
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Tipo</th>
+            <th>Descrição</th>
+            <th>Categoria</th>
+            <th>Conta</th>
+            <th>Observação</th>
+            <th class="coluna-valor">Valor</th>
+          </tr>
+        </thead>
+
+        <tbody id="lista-relatorio">
+          <tr>
+            <td
+              colspan="7"
+              class="tabela-vazia"
+            >
+              Use os filtros e clique em
+              “Gerar relatório”.
+            </td>
+          </tr>
+        </tbody>
+
+        <tfoot>
+          <tr>
+            <th colspan="6">
+              Total do relatório
+            </th>
+
+            <th
+              id="relatorio-total-tabela"
+              class="coluna-valor"
+            >
+              R$ 0,00
+            </th>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <footer class="rodape-relatorio">
+      <span>
+        Relatório gerado pelo Gestor Financeiro.
+      </span>
+
+      <span>
+        Documento para controle interno.
+      </span>
+    </footer>
+  </div>
+
+  <p
+    id="mensagem-relatorio"
+    class="mensagem-formulario"
+  ></p>
+</section>
+
+    <!-- =========================================================
+         MENSAGEM GERAL
+    ========================================================== -->
+
+    <p id="mensagem-dashboard"></p>
+  </main>
+
+
+  <script src="/js/dashboard.js"></script>
+</body>
+</html>

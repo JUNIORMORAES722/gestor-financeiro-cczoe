@@ -1,0 +1,1477 @@
+/* ==========================================================================
+   GESTOR FINANCEIRO
+   ========================================================================== */
+
+:root {
+  --cor-primaria: #3126a6;
+  --cor-primaria-clara: #493bd0;
+  --cor-primaria-escura: #21186e;
+
+  --cor-fundo: #eef0f7;
+  --cor-cartao: #ffffff;
+  --cor-texto: #20212a;
+  --cor-texto-suave: #737582;
+  --cor-borda: #e1e3ec;
+
+  --cor-entrada: #137342;
+  --cor-entrada-fundo: #e0f6e9;
+
+  --cor-saida: #a52c2c;
+  --cor-saida-fundo: #fde5e5;
+
+  --cor-pendente: #886000;
+  --cor-pendente-fundo: #fff1bd;
+
+  --cor-cancelada: #8d3030;
+  --cor-cancelada-fundo: #ffe2e2;
+
+  --cor-inativa: #6e6e78;
+  --cor-inativa-fundo: #eeeeF2;
+
+  --sombra: 0 14px 36px rgba(37, 35, 83, 0.09);
+  --raio-cartao: 22px;
+}
+
+
+/* ==========================================================================
+   RESET
+   ========================================================================== */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+  scroll-behavior: smooth;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  color: var(--cor-texto);
+  background:
+    linear-gradient(
+      135deg,
+      #f4f5fa 0%,
+      #e9ebf4 100%
+    );
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  border: 0;
+}
+
+button,
+select {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid rgba(73, 59, 208, 0.25);
+  outline-offset: 2px;
+}
+
+table {
+  border-spacing: 0;
+}
+
+h1,
+h2,
+h3,
+p {
+  overflow-wrap: anywhere;
+}
+
+
+/* ==========================================================================
+   LOGIN
+   ========================================================================== */
+
+.pagina-login {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 24px;
+}
+
+.cartao-login {
+  width: min(100%, 470px);
+  padding: 44px;
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  border-radius: 26px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 24px 70px rgba(39, 35, 100, 0.16);
+}
+
+.marca {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 52px;
+  color: var(--cor-primaria-escura);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.marca-icone {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border-radius: 12px;
+  color: #ffffff;
+  background:
+    linear-gradient(
+      145deg,
+      #6256e4,
+      var(--cor-primaria-escura)
+    );
+  box-shadow: 0 10px 22px rgba(49, 38, 166, 0.28);
+  font-size: 18px;
+}
+
+.identificacao {
+  margin: 0 0 14px;
+  color: var(--cor-primaria-clara);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.7px;
+}
+
+.cabecalho-login h1 {
+  margin: 0;
+  color: var(--cor-texto);
+  font-size: clamp(36px, 7vw, 50px);
+  font-weight: 850;
+  letter-spacing: -2px;
+  line-height: 1.04;
+}
+
+.cabecalho-login > p:not(.identificacao) {
+  max-width: 360px;
+  margin: 22px 0 38px;
+  color: var(--cor-texto-suave);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.formulario-login {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+
+/* ==========================================================================
+   CAMPOS
+   ========================================================================== */
+
+.campo {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.campo label {
+  color: #383944;
+  font-size: 13px;
+  font-weight: 750;
+}
+
+.campo input,
+.campo select,
+.campo textarea {
+  width: 100%;
+  border: 1px solid var(--cor-borda);
+  border-radius: 13px;
+  outline: none;
+  color: var(--cor-texto);
+  background: #fafbfe;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.campo input,
+.campo select {
+  height: 52px;
+  padding: 0 16px;
+}
+
+.campo textarea {
+  min-height: 96px;
+  padding: 14px 16px;
+  resize: vertical;
+}
+
+.campo input,
+.campo select,
+.campo textarea {
+  font-size: 15px;
+}
+
+.campo input::placeholder,
+.campo textarea::placeholder {
+  color: #a4a6b1;
+}
+
+.campo input:hover,
+.campo select:hover,
+.campo textarea:hover {
+  border-color: #b8b5e5;
+}
+
+.campo input:focus,
+.campo select:focus,
+.campo textarea:focus {
+  border-color: var(--cor-primaria-clara);
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(73, 59, 208, 0.12);
+}
+
+.mensagem-login,
+.mensagem-formulario,
+.mensagem-dashboard {
+  line-height: 1.45;
+}
+
+.mensagem-login {
+  min-height: 20px;
+  margin: -5px 0 0;
+  color: #b52d2d;
+  font-size: 13px;
+}
+
+.mensagem-formulario {
+  min-height: 20px;
+  margin: 0;
+  color: var(--cor-texto-suave);
+  font-size: 14px;
+}
+
+.mensagem-formulario.sucesso,
+.mensagem-dashboard.sucesso {
+  color: var(--cor-entrada);
+}
+
+.mensagem-formulario.erro,
+.mensagem-dashboard.erro {
+  color: var(--cor-saida);
+}
+
+.mensagem-dashboard {
+  min-height: 24px;
+  margin: 22px 0 0;
+  color: var(--cor-texto-suave);
+  font-size: 14px;
+}
+
+
+/* ==========================================================================
+   BOTÕES
+   ========================================================================== */
+
+.botao-entrar,
+.botao-principal {
+  color: #ffffff;
+  background:
+    linear-gradient(
+      135deg,
+      var(--cor-primaria-clara),
+      var(--cor-primaria-escura)
+    );
+  font-weight: 800;
+  transition:
+    filter 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.botao-entrar {
+  width: 100%;
+  height: 54px;
+  margin-top: 2px;
+  border-radius: 13px;
+  box-shadow: 0 13px 25px rgba(49, 38, 166, 0.27);
+  font-size: 15px;
+}
+
+.botao-principal {
+  min-height: 48px;
+  padding: 0 22px;
+  border-radius: 11px;
+  box-shadow: 0 8px 18px rgba(49, 38, 166, 0.16);
+}
+
+.botao-entrar:hover,
+.botao-principal:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+.botao-entrar:active,
+.botao-principal:active {
+  transform: translateY(0);
+}
+
+.botao-secundario {
+  min-height: 48px;
+  padding: 0 18px;
+  border: 1px solid var(--cor-borda);
+  border-radius: 11px;
+  color: var(--cor-texto-suave);
+  background: #f8f9fc;
+  font-weight: 750;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.botao-secundario:hover {
+  border-color: #b9b6e5;
+  background: #ffffff;
+  transform: translateY(-1px);
+}
+
+
+/* ==========================================================================
+   DASHBOARD
+   ========================================================================== */
+
+.dashboard {
+  width: min(calc(100% - 40px), 1480px);
+  margin: 30px auto 60px;
+}
+
+.dashboard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+  min-height: 190px;
+  margin-bottom: 28px;
+  padding: 38px 48px;
+  border-radius: 25px;
+  color: #ffffff;
+  background:
+    linear-gradient(
+      135deg,
+      #3225a8 0%,
+      #251878 100%
+    );
+  box-shadow: 0 22px 48px rgba(46, 37, 146, 0.24);
+}
+
+.dashboard-header h1 {
+  margin: 0 0 10px;
+  color: #ffffff;
+  font-size: clamp(32px, 5vw, 56px);
+  font-weight: 850;
+  letter-spacing: -2px;
+  line-height: 1.05;
+}
+
+.dashboard-header p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 16px;
+}
+
+#botao-sair {
+  min-width: 92px;
+  min-height: 52px;
+  padding: 0 22px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 12px;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+  font-weight: 800;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+#botao-sair:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+
+/* ==========================================================================
+   CARDS DE RESUMO
+   ========================================================================== */
+
+.cards-resumo {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+  margin-bottom: 28px;
+}
+
+.card-resumo {
+  display: flex;
+  min-height: 170px;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 28px;
+  border: 1px solid rgba(219, 221, 232, 0.9);
+  border-radius: 20px;
+  background: var(--cor-cartao);
+  box-shadow: var(--sombra);
+  transition:
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.card-resumo:hover {
+  box-shadow: 0 20px 42px rgba(37, 35, 83, 0.13);
+  transform: translateY(-2px);
+}
+
+.card-resumo span {
+  color: #3e3f4b;
+  font-size: 16px;
+  font-weight: 750;
+}
+
+.card-resumo strong {
+  font-size: clamp(27px, 3vw, 42px);
+  font-weight: 850;
+  letter-spacing: -1px;
+  white-space: nowrap;
+}
+
+#saldo-atual {
+  color: #3126a6;
+}
+
+#total-entradas {
+  color: #00834c;
+}
+
+#total-saidas {
+  color: #c51d1d;
+}
+
+#contas-pendentes {
+  color: #c77c00;
+}
+
+
+/* ==========================================================================
+   SEÇÕES
+   ========================================================================== */
+
+.secao-financeira {
+  margin-top: 28px;
+  padding: 34px;
+  overflow: hidden;
+  border: 1px solid rgba(219, 221, 232, 0.9);
+  border-radius: var(--raio-cartao);
+  background: rgba(255, 255, 255, 0.97);
+  box-shadow: var(--sombra);
+}
+
+.titulo-secao {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 28px;
+}
+
+.titulo-secao h2 {
+  margin: 0 0 9px;
+  color: var(--cor-texto);
+  font-size: clamp(25px, 3vw, 34px);
+  font-weight: 850;
+  letter-spacing: -0.7px;
+}
+
+.titulo-secao p {
+  margin: 0;
+  color: var(--cor-texto-suave);
+  font-size: 15px;
+}
+
+
+/* ==========================================================================
+   FORMULÁRIOS DO DASHBOARD
+   ========================================================================== */
+
+.formulario-lancamento {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px 28px;
+}
+
+.formulario-lancamento .campo {
+  min-width: 0;
+}
+
+.campo-largo,
+.acoes-formulario {
+  grid-column: 1 / -1;
+}
+
+.acoes-formulario {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-top: 4px;
+}
+
+.acoes-formulario .mensagem-formulario {
+  flex: 1 1 220px;
+}
+
+
+/* ==========================================================================
+   FILTROS DE CONTAS A PAGAR
+   ========================================================================== */
+
+.filtros-contas {
+  display: grid;
+  grid-template-columns: minmax(210px, 300px) minmax(280px, 1fr);
+  gap: 22px;
+  margin-bottom: 28px;
+  padding: 22px;
+  border: 1px solid var(--cor-borda);
+  border-radius: 15px;
+  background: #fafbfe;
+}
+
+.filtros-contas .campo {
+  gap: 9px;
+}
+
+.filtros-contas label {
+  color: #41424e;
+  font-size: 13px;
+  font-weight: 750;
+}
+
+.filtros-contas input,
+.filtros-contas select {
+  height: 52px;
+  padding: 0 16px;
+  border: 1px solid var(--cor-borda);
+  border-radius: 12px;
+  outline: none;
+  color: var(--cor-texto);
+  background: #ffffff;
+  font-size: 15px;
+}
+
+.filtros-contas input:focus,
+.filtros-contas select:focus {
+  border-color: var(--cor-primaria-clara);
+  box-shadow: 0 0 0 4px rgba(73, 59, 208, 0.12);
+}
+
+
+/* ==========================================================================
+   CONTÊINER DAS TABELAS
+   ========================================================================== */
+
+.tabela-wrapper {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  border-radius: 12px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-color: #454545 #e4e4e4;
+  scrollbar-width: thin;
+}
+
+.tabela-wrapper::-webkit-scrollbar {
+  height: 11px;
+}
+
+.tabela-wrapper::-webkit-scrollbar-track {
+  border-radius: 20px;
+  background: #e3e3e3;
+}
+
+.tabela-wrapper::-webkit-scrollbar-thumb {
+  border-radius: 20px;
+  background: #444444;
+}
+
+.tabela-lancamentos {
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 14px;
+}
+
+.tabela-lancamentos th {
+  padding: 16px 10px;
+  border-bottom: 2px solid var(--cor-borda);
+  color: #363743;
+  font-size: 12px;
+  font-weight: 850;
+  letter-spacing: 0.3px;
+  text-align: left;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.tabela-lancamentos td {
+  height: 76px;
+  padding: 15px 10px;
+  border-bottom: 1px solid var(--cor-borda);
+  color: #3f404a;
+  vertical-align: middle;
+}
+
+.tabela-lancamentos tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.tabela-lancamentos tbody tr:hover {
+  background: #fafaff;
+}
+
+.tabela-lancamentos td strong {
+  display: block;
+  max-width: 100%;
+  color: #20212a;
+  font-weight: 800;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tabela-vazia {
+  padding: 34px !important;
+  color: var(--cor-texto-suave) !important;
+  text-align: center !important;
+}
+
+
+/* ==========================================================================
+   LANÇAMENTOS RECENTES
+   Colunas:
+   Tipo | Descrição | Valor | Observação | Categoria | Data | Conta
+
+   Não há coluna de ação nesta tabela.
+   ========================================================================== */
+
+.tabela-recentes {
+  width: 1180px;
+  min-width: 1180px;
+}
+
+.tabela-recentes th:nth-child(1),
+.tabela-recentes td:nth-child(1) {
+  width: 125px;
+}
+
+.tabela-recentes th:nth-child(2),
+.tabela-recentes td:nth-child(2) {
+  width: 210px;
+}
+
+.tabela-recentes th:nth-child(3),
+.tabela-recentes td:nth-child(3) {
+  width: 155px;
+  text-align: center;
+}
+
+.tabela-recentes th:nth-child(4),
+.tabela-recentes td:nth-child(4) {
+  width: 190px;
+}
+
+.tabela-recentes th:nth-child(5),
+.tabela-recentes td:nth-child(5) {
+  width: 180px;
+}
+
+.tabela-recentes th:nth-child(6),
+.tabela-recentes td:nth-child(6) {
+  width: 140px;
+}
+
+.tabela-recentes th:nth-child(7),
+.tabela-recentes td:nth-child(7) {
+  width: 180px;
+}
+
+.tabela-recentes .valor-tabela {
+  text-align: center;
+}
+
+
+/* ==========================================================================
+   GERENCIAMENTO DE CONTAS
+   Colunas:
+   Nome | Tipo | Saldo inicial | Entradas | Saídas |
+   Saldo atual | Status | Ações
+   ========================================================================== */
+
+.tabela-gerenciamento-contas {
+  width: 1200px;
+  min-width: 1200px;
+}
+
+.tabela-gerenciamento-contas th:nth-child(1),
+.tabela-gerenciamento-contas td:nth-child(1) {
+  width: 170px;
+}
+
+.tabela-gerenciamento-contas th:nth-child(2),
+.tabela-gerenciamento-contas td:nth-child(2) {
+  width: 150px;
+}
+
+.tabela-gerenciamento-contas th:nth-child(3),
+.tabela-gerenciamento-contas td:nth-child(3) {
+  width: 150px;
+  text-align: center;
+}
+
+.tabela-gerenciamento-contas th:nth-child(4),
+.tabela-gerenciamento-contas td:nth-child(4) {
+  width: 150px;
+  color: var(--cor-entrada);
+  text-align: center;
+}
+
+.tabela-gerenciamento-contas th:nth-child(5),
+.tabela-gerenciamento-contas td:nth-child(5) {
+  width: 155px;
+  color: var(--cor-saida);
+  text-align: center;
+}
+
+.tabela-gerenciamento-contas th:nth-child(6),
+.tabela-gerenciamento-contas td:nth-child(6) {
+  width: 150px;
+  text-align: center;
+}
+
+.tabela-gerenciamento-contas th:nth-child(7),
+.tabela-gerenciamento-contas td:nth-child(7) {
+  width: 150px;
+  text-align: center;
+}
+
+.tabela-gerenciamento-contas th:nth-child(8),
+.tabela-gerenciamento-contas td:nth-child(8) {
+  width: 160px;
+}
+
+.tabela-gerenciamento-contas .valor-tabela {
+  text-align: center;
+  white-space: nowrap;
+}
+
+.tabela-gerenciamento-contas .tipo-entrada {
+  color: var(--cor-entrada);
+}
+
+.tabela-gerenciamento-contas .tipo-saida {
+  color: var(--cor-saida);
+}
+
+
+/* ==========================================================================
+   CONTAS A PAGAR
+   Colunas:
+   Vencimento | Descrição | Observação | Categoria | Conta |
+   Status | Valor | Ações
+   ========================================================================== */
+
+.tabela-contas-pagar {
+  width: 1110px;
+  min-width: 1110px;
+}
+
+.tabela-contas-pagar th:nth-child(1),
+.tabela-contas-pagar td:nth-child(1) {
+  width: 120px;
+}
+
+.tabela-contas-pagar th:nth-child(2),
+.tabela-contas-pagar td:nth-child(2) {
+  width: 170px;
+}
+
+.tabela-contas-pagar th:nth-child(3),
+.tabela-contas-pagar td:nth-child(3) {
+  width: 170px;
+}
+
+.tabela-contas-pagar th:nth-child(4),
+.tabela-contas-pagar td:nth-child(4) {
+  width: 150px;
+}
+
+.tabela-contas-pagar th:nth-child(5),
+.tabela-contas-pagar td:nth-child(5) {
+  width: 150px;
+}
+
+.tabela-contas-pagar th:nth-child(6),
+.tabela-contas-pagar td:nth-child(6) {
+  width: 125px;
+  text-align: center;
+}
+
+/*
+  Valor fica imediatamente antes das ações,
+  com largura menor e texto centralizado.
+*/
+.tabela-contas-pagar th:nth-child(7),
+.tabela-contas-pagar td:nth-child(7) {
+  width: 135px;
+  min-width: 135px;
+  padding-right: 6px;
+  padding-left: 6px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/*
+  Ações ficam logo depois do valor.
+*/
+.tabela-contas-pagar th:nth-child(8),
+.tabela-contas-pagar td:nth-child(8) {
+  width: 270px;
+  min-width: 270px;
+  padding-left: 6px;
+}
+
+
+/* ==========================================================================
+   VALORES, TIPOS E ETIQUETAS
+   ========================================================================== */
+
+.valor-tabela {
+  font-weight: 850;
+  white-space: nowrap;
+}
+
+.tipo-entrada {
+  color: var(--cor-entrada);
+}
+
+.tipo-saida {
+  color: var(--cor-saida);
+}
+
+.etiqueta-tipo,
+.etiqueta-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.etiqueta-tipo {
+  min-height: 27px;
+  padding: 0 10px;
+  background: #f0f1f7;
+}
+
+.etiqueta-status {
+  min-height: 30px;
+  padding: 0 11px;
+}
+
+.status-pendente {
+  color: var(--cor-pendente);
+  background: var(--cor-pendente-fundo);
+}
+
+.status-paga {
+  color: var(--cor-entrada);
+  background: var(--cor-entrada-fundo);
+}
+
+.status-cancelada {
+  color: var(--cor-cancelada);
+  background: var(--cor-cancelada-fundo);
+}
+
+
+/* ==========================================================================
+   BOTÕES DAS TABELAS
+   ========================================================================== */
+
+.acoes-tabela {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 7px;
+  min-width: 0;
+  padding: 4px 0 !important;
+  overflow: visible !important;
+  white-space: nowrap;
+}
+
+.acoes-tabela button {
+  flex: 0 0 auto;
+  min-height: 34px;
+  padding: 7px 10px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.acoes-tabela button:hover {
+  transform: translateY(-1px);
+}
+
+.acoes-tabela button:active {
+  transform: translateY(0);
+}
+
+.botao-pagar {
+  border-color: #9ed7b4 !important;
+  color: #11723f;
+  background: #edfbf2;
+}
+
+.botao-pagar:hover {
+  background: #d9f6e4;
+}
+
+.botao-cancelar {
+  border-color: #e1ca8b !important;
+  color: #816000;
+  background: #fffaf0;
+}
+
+.botao-cancelar:hover {
+  background: #fff0c5;
+}
+
+.botao-excluir {
+  border-color: #e1abab !important;
+  color: #a52c2c;
+  background: #fff7f7;
+}
+
+.botao-excluir:hover {
+  background: #ffe9e9;
+}
+
+.botao-editar-conta {
+  border-color: #bcb8ea !important;
+  color: var(--cor-primaria);
+  background: #f4f2ff;
+}
+
+.botao-editar-conta:hover {
+  background: #e8e5ff;
+}
+
+.botao-status-conta {
+  border-color: #d4d5de !important;
+  color: #5c5d68;
+  background: #fafafd;
+}
+
+.botao-status-conta:hover {
+  background: #eeeeF6;
+}
+
+
+/* ==========================================================================
+   RELATÓRIOS
+   ========================================================================== */
+
+.acoes-relatorio {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.formulario-relatorio {
+  display: grid;
+  grid-template-columns:
+    repeat(auto-fit, minmax(170px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+  padding: 18px;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  background: #fafafa;
+}
+
+.cards-relatorio {
+  display: grid;
+  grid-template-columns:
+    repeat(auto-fit, minmax(190px, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.card-relatorio {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px;
+  min-height: 90px;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  background: #ffffff;
+}
+
+.card-relatorio span {
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.card-relatorio strong {
+  color: #111827;
+  font-size: 22px;
+}
+
+.card-entradas {
+  border-left: 5px solid #16a34a;
+}
+
+.card-entradas strong {
+  color: #15803d;
+}
+
+.card-saidas {
+  border-left: 5px solid #dc2626;
+}
+
+.card-saidas strong {
+  color: #b91c1c;
+}
+
+.card-saldo {
+  border-left: 5px solid #2563eb;
+}
+
+.card-saldo strong {
+  color: #1d4ed8;
+}
+
+.cabecalho-relatorio {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.cabecalho-relatorio h3 {
+  margin: 0 0 5px;
+  color: #111827;
+  font-size: 24px;
+}
+
+.cabecalho-relatorio p {
+  margin: 0;
+  color: #6b7280;
+}
+
+.informacoes-relatorio {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  color: #6b7280;
+  font-size: 12px;
+  text-align: right;
+}
+
+.informacoes-relatorio strong {
+  color: #111827;
+}
+
+.resumo-filtros {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.resumo-filtros strong {
+  color: #374151;
+}
+
+.tabela-relatorio {
+  width: 100%; /* Ajuste para ocupar 100% da largura disponível */
+  min-width: 900px; /* Um min-width para evitar quebras em telas muito pequenas */
+}
+
+.tabela-relatorio th,
+.tabela-relatorio td {
+  vertical-align: middle;
+}
+
+.tabela-relatorio .coluna-valor {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.tabela-relatorio tfoot th {
+  padding-top: 16px;
+  border-top: 2px solid #d1d5db;
+  font-weight: 700;
+}
+
+.valor-entrada {
+  color: #15803d;
+  font-weight: 700;
+}
+
+.valor-saida {
+  color: #b91c1c;
+  font-weight: 700;
+}
+
+.tipo-entrada {
+  color: #15803d;
+  font-weight: 700;
+}
+
+.tipo-saida {
+  color: #b91c1c;
+  font-weight: 700;
+}
+
+.rodape-relatorio {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  margin-top: 22px;
+  padding-top: 12px;
+  border-top: 1px solid #e5e7eb;
+  color: #6b7280;
+  font-size: 11px;
+}
+
+
+/* ==========================================================================
+   RESPONSIVIDADE
+   ========================================================================== */
+
+@media (max-width: 1200px) {
+  .dashboard {
+    width: min(calc(100% - 32px), 1480px);
+  }
+
+  .dashboard-header {
+    padding: 34px;
+  }
+
+  .cards-resumo {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .dashboard {
+    width: calc(100% - 24px);
+    margin: 12px auto 40px;
+  }
+
+  .dashboard-header {
+    align-items: flex-start;
+    flex-direction: column;
+    min-height: 0;
+    padding: 28px 24px;
+    border-radius: 20px;
+  }
+
+  .dashboard-header h1 {
+    font-size: 36px;
+  }
+
+  #botao-sair {
+    width: 100%;
+  }
+
+  .secao-financeira {
+    padding: 22px 18px;
+    border-radius: 18px;
+  }
+
+  .titulo-secao {
+    margin-bottom: 22px;
+  }
+
+  .titulo-secao h2 {
+    font-size: 27px;
+  }
+
+  .formulario-lancamento {
+    grid-template-columns: 1fr;
+    gap: 19px;
+  }
+
+  .campo-largo,
+  .acoes-formulario {
+    grid-column: auto;
+  }
+
+  .acoes-formulario {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .acoes-formulario .botao-principal,
+  .acoes-formulario .botao-secundario {
+    width: 100%;
+  }
+
+  .acoes-formulario .mensagem-formulario {
+    width: 100%;
+  }
+
+  .filtros-contas {
+    grid-template-columns: 1fr;
+    gap: 18px;
+    padding: 18px;
+  }
+
+  /* Relatório */
+  .cabecalho-relatorio {
+    flex-direction: column;
+  }
+
+  .informacoes-relatorio {
+    text-align: left;
+  }
+
+  .rodape-relatorio {
+    flex-direction: column;
+  }
+
+  .acoes-relatorio {
+    width: 100%;
+  }
+
+  .acoes-relatorio button {
+    flex: 1;
+  }
+}
+
+@media (max-width: 560px) {
+  .pagina-login {
+    padding: 16px;
+  }
+
+  .cartao-login {
+    padding: 32px 22px;
+    border-radius: 20px;
+  }
+
+  .marca {
+    margin-bottom: 40px;
+  }
+
+  .cabecalho-login h1 {
+    font-size: 38px;
+  }
+
+  .cards-resumo {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .card-resumo {
+    min-height: 135px;
+    padding: 22px;
+  }
+
+  .card-resumo strong {
+    font-size: 30px;
+  }
+
+  .secao-financeira {
+    padding: 20px 14px;
+  }
+
+  .tabela-lancamentos th,
+  .tabela-lancamentos td {
+    padding-right: 8px;
+    padding-left: 8px;
+  }
+
+  .acoes-tabela {
+    gap: 5px;
+  }
+
+  .acoes-tabela button {
+    padding-right: 8px;
+    padding-left: 8px;
+    font-size: 11px;
+  }
+}
+
+
+/* ==========================================================================
+   CORREÇÃO ESPECÍFICA PARA A TABELA DE LANÇAMENTOS RECENTES
+   ========================================================================== */
+
+/*
+  Se o JavaScript antigo ainda gerar uma oitava célula de ação,
+  esta regra não substitui a correção do JavaScript, mas impede
+  que ela apareça visualmente na tabela de lançamentos recentes.
+*/
+.tabela-recentes th:nth-child(8),
+.tabela-recentes td:nth-child(8) {
+  display: none;
+}
+
+
+/* ==========================================================================
+   CORREÇÃO ESPECÍFICA DO GERENCIAMENTO DE CONTAS
+   ========================================================================== */
+
+.tabela-gerenciamento-contas th,
+.tabela-gerenciamento-contas td {
+  vertical-align: middle;
+}
+
+.tabela-gerenciamento-contas td:nth-child(3),
+.tabela-gerenciamento-contas td:nth-child(4),
+.tabela-gerenciamento-contas td:nth-child(5),
+.tabela-gerenciamento-contas td:nth-child(6),
+.tabela-gerenciamento-contas td:nth-child(7) {
+  text-align: center;
+}
+
+.tabela-gerenciamento-contas td:nth-child(8) {
+  overflow: visible;
+}
+
+
+/* ==========================================================================
+   CORREÇÃO ESPECÍFICA DE CONTAS A PAGAR
+   ========================================================================== */
+
+.tabela-contas-pagar td:nth-child(6),
+.tabela-contas-pagar td:nth-child(7) {
+  text-align: center;
+}
+
+.tabela-contas-pagar td:nth-child(8) {
+  overflow: visible;
+}
+
+
+/* ==========================================================================
+   ESTILOS DE IMPRESSÃO (PARA RELATÓRIO)
+   ========================================================================== */
+
+@media print {
+  body {
+    background: #ffffff !important;
+  }
+
+  body * {
+    visibility: hidden;
+  }
+
+  #secao-relatorios,
+  #secao-relatorios * {
+    visibility: visible;
+  }
+
+  #secao-relatorios {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    padding: 0;
+    background: #ffffff;
+    margin: 0 !important;
+    border: 0 !important;
+    box-shadow: none !important;
+  }
+
+  .secao-relatorios .titulo-secao,
+  .secao-relatorios .formulario-relatorio,
+  .secao-relatorios .acoes-relatorio,
+  .secao-relatorios .mensagem-formulario {
+    display: none !important;
+  }
+
+  .tabela-wrapper {
+    overflow: visible !important;
+  }
+
+  .tabela-relatorio {
+    width: 100%;
+    font-size: 10px;
+  }
+
+  .cards-relatorio {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+
+  .card-relatorio {
+    min-height: auto;
+    padding: 10px;
+  }
+
+  .card-relatorio strong {
+    font-size: 15px;
+  }
+
+  @page {
+    size: A4 landscape; /* Define o tamanho da página como A4 e orientação paisagem */
+    margin: 12mm; /* Margens de 12mm em todos os lados */
+  }
+}
