@@ -6,16 +6,35 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const usuarioRoutes = require("./routes/usuarioRoutes");
 const { db, inicializarBanco, isProducao, pool } = require("./config/database");
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
+
+app.disable("x-powered-by");
+
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  message: { mensagem: "Muitas tentativas de login. Tente em 15 minutos." }
+});
 
 if (!process.env.JWT_SECRET) {
   console.error("ERRO: JWT_SECRET não foi configurada no arquivo .env.");
   process.exit(1);
 }
 
-app.use(cors());
+app.use(helmet());
+app.use(cors({
+  origin: [
+    "https://gestor-financeiro-cczoe.onrender.com",
+    "https://juniormoraes722.github.io",
+    "http://localhost:3000",
+    "http://localhost:5173"
+  ],
+  credentials: true
+}));
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true }));
 
@@ -41,7 +60,7 @@ app.get("/api/health", (req, res) => {
 });
 
 // ================== LOGIN ==================
-app.post("/api/auth/login", async (req, res) => {
+app.post("/api/auth/login", loginLimiter, async (req, res) => {
   try {
     const { email, senha } = req.body;
     if (
@@ -71,7 +90,7 @@ app.post("/api/auth/login", async (req, res) => {
         perfil: usuario.perfil,
       },
       process.env.JWT_SECRET,
-      { expiresIn: "8h" },
+      { expiresIn: "2h" },
     );
     return res
       .status(200)
