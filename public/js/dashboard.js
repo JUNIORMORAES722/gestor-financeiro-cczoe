@@ -543,7 +543,8 @@ async function inicializarDashboard() {
       carregarLancamentos(),
       carregarContasPagar(),
       carregarFiltrosRelatorio(),
-      carregarUsuarios() // Adicione esta linha!
+      carregarUsuarios(),
+      carregarDescricoesLancamentos()
     ]);
   } catch (erro) {
     console.error(erro);
@@ -796,9 +797,25 @@ async function carregarCategoriasSaida() {
 // LANÇAMENTOS RECENTES
 // ================================================
 
+async function carregarDescricoesLancamentos() {
+  try {
+    const descricoes = await requisicaoApi("/api/lancamentos/descricoes");
+    const dataList = document.querySelector("#lista-descricoes");
+    if (!dataList) return;
+    dataList.innerHTML = "";
+    for (const desc of descricoes) {
+      const option = document.createElement("option");
+      option.value = desc;
+      dataList.appendChild(option);
+    }
+  } catch (erro) {
+    console.error("Erro ao carregar descrições:", erro);
+  }
+}
+
 async function carregarLancamentos() {
   const lancamentos = await requisicaoApi(
-    "/api/lancamentos?limite=100"
+    "/api/lancamentos?limite=10"
   );
 
   listaLancamentos.innerHTML = "";
@@ -1383,6 +1400,21 @@ function preencherFormularioUsuario(usuario) {
 // ================================================
 // FORMULÁRIO DE LANÇAMENTO
 // ================================================
+
+formLancamento.addEventListener("input", limparMensagemLancamento);
+
+document.querySelector("#valor-lancamento").addEventListener("input", (e) => {
+  let value = e.target.value.replace(/\D/g, "");
+  if (!value) {
+    e.target.value = "";
+    return;
+  }
+  value = (Number(value) / 100).toLocaleString("pt-BR", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
+  e.target.value = value;
+});
 
 formLancamento.addEventListener(
   "submit",
@@ -2177,24 +2209,27 @@ function escaparHtml(valor) {
 }
 
 
-function mostrarMensagemLancamento(
-  texto,
-  tipo
-) {
-  mensagemLancamento.textContent =
-    texto;
+let timeoutMensagemLancamento = null;
 
-  mensagemLancamento.className =
-    `mensagem-formulario ${tipo}`;
+function mostrarMensagemLancamento(texto, tipo) {
+  mensagemLancamento.textContent = texto;
+  mensagemLancamento.className = `mensagem-formulario ${tipo}`;
+
+  if (timeoutMensagemLancamento) {
+    clearTimeout(timeoutMensagemLancamento);
+    timeoutMensagemLancamento = null;
+  }
+
+  if (tipo === "sucesso") {
+    timeoutMensagemLancamento = setTimeout(() => {
+      limparMensagemLancamento();
+    }, 5000);
+  }
 }
 
-
 function limparMensagemLancamento() {
-  mensagemLancamento.textContent =
-    "";
-
-  mensagemLancamento.className =
-    "mensagem-formulario";
+  mensagemLancamento.textContent = "";
+  mensagemLancamento.className = "mensagem-formulario";
 }
 
 

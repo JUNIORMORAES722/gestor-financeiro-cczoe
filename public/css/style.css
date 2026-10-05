@@ -1419,19 +1419,15 @@ p {
     background: #ffffff !important;
   }
 
-  body * {
-    visibility: hidden;
+  body > *:not(.dashboard) {
+    display: none !important;
   }
 
-  #secao-relatorios,
-  #secao-relatorios * {
-    visibility: visible;
+  .dashboard > *:not(#secao-relatorios) {
+    display: none !important;
   }
 
   #secao-relatorios {
-    position: absolute;
-    left: 0;
-    top: 0;
     width: 100%;
     padding: 0;
     background: #ffffff;

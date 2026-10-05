@@ -2,7 +2,7 @@ const path = require("path");
 const fs = require("fs");
 const bcrypt = require("bcryptjs");
 
-const isProducao =!!process.env.DATABASE_URL;
+const isProducao = !!process.env.DATABASE_URL;
 let pool = null;
 let sqliteDb = null;
 
@@ -10,7 +10,7 @@ if (isProducao) {
   const { Pool } = require("pg");
   pool = new Pool({
     connectionString: process.env.DATABASE_URL,
-    ssl: { rejectUnauthorized: false }
+    ssl: { rejectUnauthorized: false },
   });
   console.log("-> Banco: PostgreSQL Neon (produção)");
 } else {
@@ -41,27 +41,30 @@ const db = {
         run: async (...params) => {
           // Para INSERT
           const isInsert = pgSql.trim().toLowerCase().startsWith("insert");
-          const finalSql = isInsert &&!pgSql.toLowerCase().includes("returning")? pgSql + " RETURNING id" : pgSql;
+          const finalSql =
+            isInsert && !pgSql.toLowerCase().includes("returning")
+              ? pgSql + " RETURNING id"
+              : pgSql;
           const r = await pool.query(finalSql, params);
           return {
             lastInsertRowid: r.rows[0]?.id || 0,
-            changes: r.rowCount
+            changes: r.rowCount,
           };
-        }
+        },
       };
     } else {
       const stmt = sqliteDb.prepare(sql);
       return {
         get: (...params) => stmt.get(...params),
         all: (...params) => stmt.all(...params),
-        run: (...params) => stmt.run(...params)
+        run: (...params) => stmt.run(...params),
       };
     }
   },
   exec: async (sql) => {
     if (isProducao) await pool.query(sql);
     else sqliteDb.exec(sql);
-  }
+  },
 };
 
 async function criarTabelas() {
@@ -182,29 +185,70 @@ async function criarAdministradorInicial() {
   const emailOriginal = process.env.ADMIN_EMAIL;
   const senha = process.env.ADMIN_SENHA;
   const nome = process.env.ADMIN_NOME || "Administrador";
-  if (!emailOriginal ||!senha) {
+  if (!emailOriginal || !senha) {
     console.warn("Admin não criado: confira ADMIN_EMAIL e ADMIN_SENHA no.env");
     return;
   }
   const email = emailOriginal.trim().toLowerCase();
-  const adminExiste = await db.prepare("SELECT id FROM usuarios WHERE email =?").get(email);
+  const adminExiste = await db
+    .prepare("SELECT id FROM usuarios WHERE email =?")
+    .get(email);
   if (!adminExiste) {
     const senhaHash = bcrypt.hashSync(senha, 10);
-    await db.prepare(`INSERT INTO usuarios (nome, email, senha_hash, perfil) VALUES (?,?,?,?)`).run(nome, email, senhaHash, "administrador");
+    await db
+      .prepare(
+        `INSERT INTO usuarios (nome, email, senha_hash, perfil) VALUES (?,?,?,?)`,
+      )
+      .run(nome, email, senhaHash, "administrador");
     console.log("Usuário administrador inicial criado");
   }
 }
 
 async function criarDadosIniciais() {
-  const totalContas = await db.prepare("SELECT COUNT(*) AS total FROM contas").get();
+  const totalContas = await db
+    .prepare("SELECT COUNT(*) AS total FROM contas")
+    .get();
   if (Number(totalContas.total) === 0) {
-    await db.prepare(`INSERT INTO contas (nome, tipo, saldo_inicial) VALUES (?,?,?)`).run("Caixa Principal", "caixa", 0);
+    await db
+      .prepare(`INSERT INTO contas (nome, tipo, saldo_inicial) VALUES (?,?,?)`)
+      .run("Caixa Principal", "caixa", 0);
   }
-  const totalCategorias = await db.prepare("SELECT COUNT(*) AS total FROM categorias").get();
+  const totalCategorias = await db
+    .prepare("SELECT COUNT(*) AS total FROM categorias")
+    .get();
   if (Number(totalCategorias.total) === 0) {
-    const categorias = [["Dízimos","entrada"],["Ofertas","entrada"],["Doações","entrada"],["Eventos","entrada"],["Água e Energia","saida"],["Manutenção","saida"],["Material de Escritório","saida"],["Ação Social","saida"]];
-    for (const [n,t] of categorias) {
-      await db.prepare(`INSERT INTO categorias (nome, tipo) VALUES (?,?)`).run(n,t);
+    const categorias = [
+      ["Dízimos", "entrada"],
+      ["Ofertas", "entrada"],
+      ["Doações", "entrada"],
+      ["Eventos", "entrada"],
+      ["Água e Energia", "saida"],
+      ["Manutenção", "saida"],
+      ["Material de Escritório", "saida"],
+      ["Ação Social", "saida"],
+    ];
+    for (const [n, t] of categorias) {
+      await db
+        .prepare(`INSERT INTO categorias (nome, tipo) VALUES (?,?)`)
+        .run(n, t);
+    }
+  }
+
+  const categoriasExtras = [
+    ["Diversos", "entrada"],
+    ["Diversos", "saida"],
+    ["Material de limpeza", "saida"],
+    ["Combustível", "saida"],
+    ["Plano de saúde", "saida"],
+  ];
+  for (const [n, t] of categoriasExtras) {
+    const existe = await db
+      .prepare("SELECT id FROM categorias WHERE nome = ? AND tipo = ?")
+      .get(n, t);
+    if (!existe) {
+      await db
+        .prepare("INSERT INTO categorias (nome, tipo) VALUES (?,?)")
+        .run(n, t);
     }
   }
 }

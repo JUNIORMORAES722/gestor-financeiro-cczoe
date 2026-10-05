@@ -399,6 +399,20 @@ app.patch("/api/contas/:id/status", autenticarToken, async (req, res) => {
 });
 
 // ================== LANÇAMENTOS ==================
+app.get("/api/lancamentos/descricoes", autenticarToken, async (req, res) => {
+  try {
+    const descricoes = await db
+      .prepare(`SELECT DISTINCT descricao FROM movimentacoes ORDER BY descricao`)
+      .all();
+    return res.json(descricoes.map((d) => d.descricao));
+  } catch (erro) {
+    console.error("Erro ao listar descrições:", erro);
+    return res
+      .status(500)
+      .json({ mensagem: "Não foi possível carregar as descrições." });
+  }
+});
+
 app.get("/api/lancamentos", autenticarToken, async (req, res) => {
   try {
     const limiteInformado = Number(req.query.limite);
