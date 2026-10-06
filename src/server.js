@@ -820,6 +820,59 @@ app.get("/api/dashboard/resumo", autenticarToken, async (req, res) => {
   }
 });
 
+// ================== GRÁFICO ==================
+app.get("/api/dashboard/grafico", autenticarToken, async (req, res) => {
+  try {
+    const hoje = new Date();
+    const graficoData = [];
+
+    // Preenche os últimos 12 meses (incluindo o atual) com 0
+    for (let i = 11; i >= 0; i--) {
+      const dataMes = new Date(hoje.getFullYear(), hoje.getMonth() - i, 1);
+      const ano = dataMes.getFullYear();
+      const mes = String(dataMes.getMonth() + 1).padStart(2, "0");
+      graficoData.push({
+        mesAno: `${ano}-${mes}`,
+        entradas: 0,
+        saidas: 0
+      });
+    }
+
+    const dataInicio = graficoData[0].mesAno + "-01";
+    const mesAtual = obterDataAtualISO().substring(0, 7);
+
+    const entradas = await db
+      .prepare(
+        `SELECT substr(data_movimentacao, 1, 7) AS mesano, SUM(valor) AS total FROM movimentacoes WHERE tipo = 'entrada' AND data_movimentacao >= ? AND substr(data_movimentacao, 1, 7) <= ? GROUP BY substr(data_movimentacao, 1, 7)`
+      )
+      .all(dataInicio, mesAtual);
+
+    const saidas = await db
+      .prepare(
+        `SELECT substr(data_movimentacao, 1, 7) AS mesano, SUM(valor) AS total FROM movimentacoes WHERE tipo = 'saida' AND data_movimentacao >= ? AND substr(data_movimentacao, 1, 7) <= ? GROUP BY substr(data_movimentacao, 1, 7)`
+      )
+      .all(dataInicio, mesAtual);
+
+    for (const item of graficoData) {
+      const entradaEncontrada = entradas.find((e) => (e.mesano || e.mesAno) === item.mesAno);
+      if (entradaEncontrada) {
+        item.entradas = Number(entradaEncontrada.total);
+      }
+      const saidaEncontrada = saidas.find((s) => (s.mesano || s.mesAno) === item.mesAno);
+      if (saidaEncontrada) {
+        item.saidas = Number(saidaEncontrada.total);
+      }
+    }
+
+    return res.json(graficoData);
+  } catch (erro) {
+    console.error("Erro ao carregar dados do gráfico:", erro);
+    return res
+      .status(500)
+      .json({ mensagem: "Não foi possível carregar os dados do gráfico." });
+  }
+});
+
 // ================== RELATÓRIO ==================
 app.get("/api/relatorios/lancamentos", autenticarToken, async (req, res) => {
   try {

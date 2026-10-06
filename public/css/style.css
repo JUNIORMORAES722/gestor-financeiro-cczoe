@@ -743,56 +743,39 @@ p {
    ========================================================================== */
 
 .tabela-gerenciamento-contas {
-  width: 1200px;
-  min-width: 1200px;
-}
-
-.tabela-gerenciamento-contas th:nth-child(1),
-.tabela-gerenciamento-contas td:nth-child(1) {
-  width: 170px;
-}
-
-.tabela-gerenciamento-contas th:nth-child(2),
-.tabela-gerenciamento-contas td:nth-child(2) {
-  width: 150px;
+  width: 100%;
+  min-width: 100%;
+  table-layout: auto;
 }
 
 .tabela-gerenciamento-contas th:nth-child(3),
 .tabela-gerenciamento-contas td:nth-child(3) {
-  width: 150px;
   text-align: center;
 }
 
 .tabela-gerenciamento-contas th:nth-child(4),
 .tabela-gerenciamento-contas td:nth-child(4) {
-  width: 150px;
   color: var(--cor-entrada);
   text-align: center;
 }
 
 .tabela-gerenciamento-contas th:nth-child(5),
 .tabela-gerenciamento-contas td:nth-child(5) {
-  width: 155px;
   color: var(--cor-saida);
   text-align: center;
 }
 
 .tabela-gerenciamento-contas th:nth-child(6),
 .tabela-gerenciamento-contas td:nth-child(6) {
-  width: 150px;
   text-align: center;
 }
 
 .tabela-gerenciamento-contas th:nth-child(7),
 .tabela-gerenciamento-contas td:nth-child(7) {
-  width: 150px;
   text-align: center;
 }
 
-.tabela-gerenciamento-contas th:nth-child(8),
-.tabela-gerenciamento-contas td:nth-child(8) {
-  width: 160px;
-}
+
 
 .tabela-gerenciamento-contas .valor-tabela {
   text-align: center;

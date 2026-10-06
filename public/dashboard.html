@@ -8,7 +8,7 @@
   >
   <title>Dashboard - Gestor Financeiro</title>
   <meta name="description" content="Painel de controle do Gestor Financeiro.">
-  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/style.css?v=2">
 </head>
 
 <body>
@@ -72,6 +72,24 @@
           R$ 0,00
         </strong>
       </article>
+    </section>
+
+    <!-- =========================================================
+         GRÁFICO FINANCEIRO
+    ========================================================== -->
+
+    <section class="secao-financeira secao-grafico">
+      <div class="titulo-secao">
+        <div>
+          <h2>Desempenho financeiro</h2>
+          <p>
+            Entradas e saídas dos últimos 12 meses.
+          </p>
+        </div>
+      </div>
+      <div class="grafico-wrapper" style="position: relative; width: 100%; height: 300px; margin-top: 1rem; overflow: hidden;">
+        <canvas id="grafico-financeiro"></canvas>
+      </div>
     </section>
 
     <!-- =========================================================
@@ -924,7 +942,7 @@
     <p id="mensagem-dashboard"></p>
   </main>
 
-
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="/js/dashboard.js"></script>
 </body>
 </html>

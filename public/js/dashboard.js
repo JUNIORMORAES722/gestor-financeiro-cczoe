@@ -537,6 +537,7 @@ async function inicializarDashboard() {
   try {
     await Promise.all([
       carregarResumo(),
+      carregarGrafico(),
       carregarContas(),
       carregarContasGerenciamento(),
       carregarCategorias(),
@@ -658,6 +659,142 @@ async function carregarResumo() {
     formatarMoeda(dados.contasPendentes);
 }
 
+// ================================================
+// GRÁFICO
+// ================================================
+
+let chartInstancia = null;
+
+async function carregarGrafico() {
+  const canvasGrafico = document.querySelector("#grafico-financeiro");
+  if (!canvasGrafico) return;
+
+  const dados = await requisicaoApi("/api/dashboard/grafico");
+  
+  const mesesAbreviados = [
+    "Jan", "Fev", "Mar", "Abr", "Mai", "Jun", 
+    "Jul", "Ago", "Set", "Out", "Nov", "Dez"
+  ];
+  
+  const labels = dados.map(item => {
+    const partes = item.mesAno.split("-");
+    const mesIdx = Number(partes[1]) - 1;
+    return mesesAbreviados[mesIdx];
+  });
+
+  const entradasData = dados.map(item => item.entradas);
+  const saidasData = dados.map(item => item.saidas);
+
+  if (chartInstancia) {
+    chartInstancia.destroy();
+  }
+
+  chartInstancia = new Chart(canvasGrafico, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: 'Entradas',
+          data: entradasData,
+          backgroundColor: '#10b981',
+          borderRadius: 6,
+          borderSkipped: false,
+          barPercentage: 0.7,
+          categoryPercentage: 0.6
+        },
+        {
+          label: 'Saídas',
+          data: saidasData,
+          backgroundColor: '#ef4444',
+          borderRadius: 6,
+          borderSkipped: false,
+          barPercentage: 0.7,
+          categoryPercentage: 0.6
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: {
+        mode: 'index',
+        intersect: false,
+      },
+      plugins: {
+        tooltip: {
+          backgroundColor: 'rgba(17, 24, 39, 0.9)',
+          titleFont: { size: 14, family: 'sans-serif' },
+          bodyFont: { size: 13, family: 'sans-serif' },
+          padding: 12,
+          cornerRadius: 8,
+          callbacks: {
+            label: function(context) {
+              let label = context.dataset.label || '';
+              if (label) {
+                label += ': ';
+              }
+              if (context.parsed.y !== null) {
+                label += new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(context.parsed.y);
+              }
+              return label;
+            }
+          }
+        },
+        legend: {
+          position: 'top',
+          align: 'end',
+          labels: {
+            usePointStyle: true,
+            boxWidth: 8,
+            boxHeight: 8,
+            font: {
+              family: 'sans-serif',
+              size: 13,
+              weight: '500'
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: {
+            display: false,
+            drawBorder: false,
+          },
+          ticks: {
+            font: {
+              family: 'sans-serif',
+              size: 12
+            },
+            color: '#6b7280'
+          }
+        },
+        y: {
+          beginAtZero: true,
+          border: {
+            display: false
+          },
+          grid: {
+            color: '#e5e7eb',
+            drawBorder: false,
+            borderDash: [4, 4]
+          },
+          ticks: {
+            font: {
+              family: 'sans-serif',
+              size: 12
+            },
+            color: '#6b7280',
+            callback: function(value) {
+              return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumSignificantDigits: 3 }).format(value);
+            }
+          }
+        }
+      }
+    }
+  });
+}
 
 // ================================================
 // CARREGAR CONTAS NOS FORMULÁRIOS
@@ -815,7 +952,7 @@ async function carregarDescricoesLancamentos() {
 
 async function carregarLancamentos() {
   const lancamentos = await requisicaoApi(
-    "/api/lancamentos?limite=10"
+    "/api/lancamentos?limite=20"
   );
 
   listaLancamentos.innerHTML = "";
@@ -1154,7 +1291,7 @@ formConta.addEventListener(
       await Promise.all([
         carregarContas(),
         carregarContasGerenciamento(),
-        carregarResumo()
+        carregarResumo(), carregarGrafico()
       ]);
     } catch (erro) {
       console.error(
@@ -1294,7 +1431,7 @@ listaGerenciamentoContas.addEventListener(
       await Promise.all([
         carregarContas(),
         carregarContasGerenciamento(),
-        carregarResumo()
+        carregarResumo(), carregarGrafico()
       ]);
 
       mostrarMensagemDashboard(
@@ -1474,7 +1611,7 @@ formLancamento.addEventListener(
       limparFormularioLancamento();
 
       await Promise.all([
-        carregarResumo(),
+        carregarResumo(), carregarGrafico(),
         carregarContasGerenciamento(),
         carregarLancamentos()
       ]);
@@ -1595,7 +1732,7 @@ formContaPagar.addEventListener(
       definirVencimentoAtual();
 
       await Promise.all([
-        carregarResumo(),
+        carregarResumo(), carregarGrafico(),
         carregarContasPagar()
       ]);
     } catch (erro) {
@@ -1824,7 +1961,7 @@ listaContasPagar.addEventListener(
         );
 
         await Promise.all([
-          carregarResumo(),
+          carregarResumo(), carregarGrafico(),
           carregarLancamentos(),
           carregarContasPagar()
         ]);
@@ -1861,7 +1998,7 @@ listaContasPagar.addEventListener(
         );
 
         await Promise.all([
-          carregarResumo(),
+          carregarResumo(), carregarGrafico(),
           carregarContasPagar()
         ]);
 
@@ -1897,7 +2034,7 @@ listaContasPagar.addEventListener(
         );
 
         await Promise.all([
-          carregarResumo(),
+          carregarResumo(), carregarGrafico(),
           carregarContasPagar()
         ]);
 
