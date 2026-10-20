@@ -164,6 +164,11 @@ function dataValida(data) {
 function obterIdUsuario(req) {
   return Number(req.usuario?.id);
 }
+function isGestorOuAdmin(req) {
+  if (!req.usuario || !req.usuario.perfil) return false;
+  const perfil = String(req.usuario.perfil).trim().toLowerCase();
+  return perfil === "administrador" || perfil === "gestor" || perfil === "admin";
+}
 function obterDataAtualISO() {
   const agora = new Date();
   return `${agora.getFullYear()}-${String(agora.getMonth() + 1).padStart(2, "0")}-${String(agora.getDate()).padStart(2, "0")}`;
@@ -435,7 +440,7 @@ app.get("/api/lancamentos", autenticarToken, async (req, res) => {
         : 100;
     const lancamentos = await db
       .prepare(
-        `SELECT movimentacoes.id, movimentacoes.tipo, movimentacoes.descricao, movimentacoes.valor, movimentacoes.data_movimentacao, movimentacoes.observacao, movimentacoes.criado_em, categorias.id AS categoria_id, categorias.nome AS categoria_nome, contas.id AS conta_id, contas.nome AS conta_nome, usuarios.id AS usuario_id, usuarios.nome AS usuario_nome FROM movimentacoes LEFT JOIN categorias ON categorias.id = movimentacoes.categoria_id INNER JOIN contas ON contas.id = movimentacoes.conta_id INNER JOIN usuarios ON usuarios.id = movimentacoes.usuario_id ORDER BY movimentacoes.data_movimentacao DESC, movimentacoes.id DESC LIMIT ?`,
+        `SELECT movimentacoes.id, movimentacoes.tipo, movimentacoes.descricao, movimentacoes.valor, movimentacoes.data_movimentacao, movimentacoes.observacao, movimentacoes.criado_em, movimentacoes.atualizado_em, categorias.id AS categoria_id, categorias.nome AS categoria_nome, contas.id AS conta_id, contas.nome AS conta_nome, criadores.id AS usuario_id, criadores.nome AS usuario_nome, editores.nome AS editado_por_nome FROM movimentacoes LEFT JOIN categorias ON categorias.id = movimentacoes.categoria_id INNER JOIN contas ON contas.id = movimentacoes.conta_id INNER JOIN usuarios criadores ON criadores.id = movimentacoes.usuario_id LEFT JOIN usuarios editores ON editores.id = movimentacoes.editado_por ORDER BY movimentacoes.data_movimentacao DESC, movimentacoes.id DESC LIMIT ?`,
       )
       .all(limite);
     return res.json(lancamentos);
@@ -538,6 +543,89 @@ app.post("/api/lancamentos", autenticarToken, async (req, res) => {
     return res
       .status(500)
       .json({ mensagem: "Não foi possível criar o lançamento." });
+  }
+});
+
+
+app.put("/api/lancamentos/:id", autenticarToken, async (req, res) => {
+  try {
+    if (!isGestorOuAdmin(req)) {
+      return res.status(403).json({ mensagem: "Apenas gestores ou administradores podem editar lançamentos." });
+    }
+    const id = Number(req.params.id);
+    if (!Number.isInteger(id) || id <= 0) {
+      return res.status(400).json({ mensagem: "Identificador inválido." });
+    }
+    const lancamentoExistente = await db
+      .prepare(`SELECT id FROM movimentacoes WHERE id =?`)
+      .get(id);
+    if (!lancamentoExistente) {
+      return res.status(404).json({ mensagem: "Lançamento não encontrado." });
+    }
+    const { tipo, descricao, valor, dataMovimentacao, categoriaId, contaId, observacao } = req.body;
+    if (tipo !== "entrada" && tipo !== "saida") {
+      return res.status(400).json({ mensagem: "O tipo deve ser entrada ou saida." });
+    }
+    if (typeof descricao !== "string" || !descricao.trim()) {
+      return res.status(400).json({ mensagem: "Informe a descrição do lançamento." });
+    }
+    const valorNumerico = normalizarValor(valor);
+    if (!Number.isFinite(valorNumerico) || valorNumerico <= 0) {
+      return res.status(400).json({ mensagem: "Informe um valor maior que zero." });
+    }
+    if (!dataValida(dataMovimentacao)) {
+      return res.status(400).json({ mensagem: "Informe uma data válida no formato correto." });
+    }
+    const contaIdNumerico = Number(contaId);
+    if (!Number.isInteger(contaIdNumerico) || contaIdNumerico <= 0) {
+      return res.status(400).json({ mensagem: "Informe uma conta válida." });
+    }
+    const conta = await db
+      .prepare(`SELECT id FROM contas WHERE id =? AND ativo = 1`)
+      .get(contaIdNumerico);
+    if (!conta) {
+      return res.status(400).json({ mensagem: "A conta informada não existe ou está inativa." });
+    }
+    let categoriaIdNumerico = null;
+    if (categoriaId !== undefined && categoriaId !== null && String(categoriaId).trim() !== "") {
+      categoriaIdNumerico = Number(categoriaId);
+      if (!Number.isInteger(categoriaIdNumerico) || categoriaIdNumerico <= 0) {
+        return res.status(400).json({ mensagem: "Informe uma categoria válida." });
+      }
+      const categoria = await db
+        .prepare(`SELECT id FROM categorias WHERE id =? AND tipo =? AND ativo = 1`)
+        .get(categoriaIdNumerico, tipo);
+      if (!categoria) {
+        return res.status(400).json({ mensagem: "A categoria não corresponde ao tipo do lançamento." });
+      }
+    }
+    const usuarioIdEditor = obterIdUsuario(req);
+    const dataHoraAtual = new Date().toISOString();
+    await db
+      .prepare(
+        `UPDATE movimentacoes SET tipo = ?, descricao = ?, valor = ?, data_movimentacao = ?, categoria_id = ?, conta_id = ?, observacao = ?, editado_por = ?, atualizado_em = ? WHERE id = ?`
+      )
+      .run(
+        tipo,
+        descricao.trim(),
+        valorNumerico,
+        dataMovimentacao,
+        categoriaIdNumerico,
+        contaIdNumerico,
+        typeof observacao === "string" ? observacao.trim() || null : null,
+        usuarioIdEditor,
+        dataHoraAtual,
+        id
+      );
+    const lancamentoAtualizado = await db
+      .prepare(
+        `SELECT movimentacoes.id, movimentacoes.tipo, movimentacoes.descricao, movimentacoes.valor, movimentacoes.data_movimentacao, movimentacoes.observacao, movimentacoes.criado_em, movimentacoes.atualizado_em, categorias.nome AS categoria_nome, contas.nome AS conta_nome, criadores.nome AS usuario_nome, editores.nome AS editado_por_nome FROM movimentacoes LEFT JOIN categorias ON categorias.id = movimentacoes.categoria_id INNER JOIN contas ON contas.id = movimentacoes.conta_id INNER JOIN usuarios criadores ON criadores.id = movimentacoes.usuario_id LEFT JOIN usuarios editores ON editores.id = movimentacoes.editado_por WHERE movimentacoes.id =?`
+      )
+      .get(id);
+    return res.json({ mensagem: "Lançamento atualizado com sucesso.", lancamento: lancamentoAtualizado });
+  } catch (erro) {
+    console.error("Erro ao atualizar lançamento:", erro);
+    return res.status(500).json({ mensagem: "Não foi possível atualizar o lançamento." });
   }
 });
 

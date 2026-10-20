@@ -253,8 +253,31 @@ async function criarDadosIniciais() {
   }
 }
 
+
+async function migrarTabelas() {
+  try {
+    if (isProducao) {
+      await pool.query(`
+        ALTER TABLE movimentacoes ADD COLUMN IF NOT EXISTS editado_por INTEGER REFERENCES usuarios(id);
+        ALTER TABLE movimentacoes ADD COLUMN IF NOT EXISTS atualizado_em TIMESTAMP;
+      `);
+    } else {
+      const colunas = sqliteDb.pragma('table_info(movimentacoes)').map(c => c.name);
+      if (!colunas.includes('editado_por')) {
+        sqliteDb.exec('ALTER TABLE movimentacoes ADD COLUMN editado_por INTEGER REFERENCES usuarios(id)');
+      }
+      if (!colunas.includes('atualizado_em')) {
+        sqliteDb.exec('ALTER TABLE movimentacoes ADD COLUMN atualizado_em TEXT');
+      }
+    }
+  } catch (err) {
+    console.warn('Aviso ao verificar colunas de movimentacoes:', err.message);
+  }
+}
+
 async function inicializarBanco() {
   await criarTabelas();
+  await migrarTabelas();
   await criarAdministradorInicial();
   await criarDadosIniciais();
 }

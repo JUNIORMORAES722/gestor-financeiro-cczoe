@@ -82,6 +82,24 @@ const botaoSalvarLancamento =
     "#botao-salvar-lancamento"
   );
 
+const botaoCancelarEdicaoLancamento =
+  document.querySelector(
+    "#botao-cancelar-edicao-lancamento"
+  );
+
+let lancamentoEmEdicaoId = null;
+
+function podeGerenciarLancamentos() {
+  if (!usuarioSalvo) return false;
+  try {
+    const u = JSON.parse(usuarioSalvo);
+    const p = String(u.perfil || "").trim().toLowerCase();
+    return p === "administrador" || p === "gestor" || p === "admin";
+  } catch (e) {
+    return false;
+  }
+}
+
 
 // ================================================
 // CONTAS A PAGAR
@@ -961,7 +979,7 @@ async function carregarLancamentos() {
     listaLancamentos.innerHTML = `
       <tr>
         <td
-          colspan="7"
+          colspan="9"
           class="tabela-vazia"
         >
           Nenhum lançamento cadastrado.
@@ -985,8 +1003,14 @@ async function carregarLancamentos() {
         ? "+"
         : "-";
 
+    const podeEditar = podeGerenciarLancamentos();
+    const infoResponsavel = `
+      <strong>${escaparHtml(lancamento.usuario_nome || "-")}</strong>
+      ${lancamento.editado_por_nome ? `<br><small style="color:#6b7280; font-size:0.75rem;">Editado por: ${escaparHtml(lancamento.editado_por_nome)}</small>` : ""}
+    `;
+
     linha.innerHTML = `
-      <td>
+      <td data-label="Tipo">
         <span
           class="etiqueta-tipo ${classeTipo}"
         >
@@ -998,7 +1022,7 @@ async function carregarLancamentos() {
         </span>
       </td>
 
-      <td>
+      <td data-label="Descrição">
         <strong>
           ${escaparHtml(
             lancamento.descricao
@@ -1006,14 +1030,14 @@ async function carregarLancamentos() {
         </strong>
       </td>
 
-      <td
+      <td data-label="Valor"
         class="${classeTipo} valor-tabela"
       >
         ${sinal}
         ${formatarMoeda(lancamento.valor)}
       </td>
 
-      <td>
+      <td data-label="Observação">
         ${
           lancamento.observacao
             ? escaparHtml(
@@ -1023,23 +1047,31 @@ async function carregarLancamentos() {
         }
       </td>
 
-      <td>
+      <td data-label="Categoria">
         ${escaparHtml(
           lancamento.categoria_nome ||
             "Sem categoria"
         )}
       </td>
 
-      <td>
+      <td data-label="Data">
         ${formatarData(
           lancamento.data_movimentacao
         )}
       </td>
 
-      <td>
+      <td data-label="Conta">
         ${escaparHtml(
           lancamento.conta_nome || "-"
         )}
+      </td>
+
+      <td data-label="Responsável">
+        ${infoResponsavel}
+      </td>
+
+      <td data-label="Ações" class="acoes-tabela">
+        ${podeEditar ? `<button type="button" class="botao-editar-lancamento" data-id="${lancamento.id}">Editar</button>` : "-"}
       </td>
     `;
 
@@ -1595,18 +1627,33 @@ formLancamento.addEventListener(
       "Salvando...";
 
     try {
-      await requisicaoApi(
-        "/api/lancamentos",
-        {
-          method: "POST",
-          body: JSON.stringify(dados)
-        }
-      );
+      if (lancamentoEmEdicaoId) {
+        await requisicaoApi(
+          `/api/lancamentos/${lancamentoEmEdicaoId}`,
+          {
+            method: "PUT",
+            body: JSON.stringify(dados)
+          }
+        );
 
-      mostrarMensagemLancamento(
-        "Lançamento salvo com sucesso.",
-        "sucesso"
-      );
+        mostrarMensagemLancamento(
+          "Lançamento atualizado com sucesso.",
+          "sucesso"
+        );
+      } else {
+        await requisicaoApi(
+          "/api/lancamentos",
+          {
+            method: "POST",
+            body: JSON.stringify(dados)
+          }
+        );
+
+        mostrarMensagemLancamento(
+          "Lançamento salvo com sucesso.",
+          "sucesso"
+        );
+      }
 
       limparFormularioLancamento();
 
@@ -1630,7 +1677,7 @@ formLancamento.addEventListener(
         false;
 
       botaoSalvarLancamento.textContent =
-        "Salvar lançamento";
+        lancamentoEmEdicaoId ? "Salvar alterações" : "Salvar lançamento";
     }
   }
 );
@@ -1652,6 +1699,8 @@ tipoLancamento.addEventListener(
 
 
 function limparFormularioLancamento() {
+  lancamentoEmEdicaoId = null;
+
   document.querySelector(
     "#descricao-lancamento"
   ).value = "";
@@ -1665,6 +1714,74 @@ function limparFormularioLancamento() {
   ).value = "";
 
   definirDataAtual();
+
+  if (botaoSalvarLancamento) {
+    botaoSalvarLancamento.textContent = "Salvar lançamento";
+  }
+  if (botaoCancelarEdicaoLancamento) {
+    botaoCancelarEdicaoLancamento.hidden = true;
+  }
+}
+
+async function preencherFormularioLancamento(lancamento) {
+  lancamentoEmEdicaoId = Number(lancamento.id);
+  tipoLancamento.value = lancamento.tipo;
+
+  try {
+    await carregarCategorias();
+  } catch (e) {
+    console.error(e);
+  }
+
+  if (lancamento.categoria_id) {
+    categoriaLancamento.value = String(lancamento.categoria_id);
+  } else {
+    categoriaLancamento.value = "";
+  }
+
+  if (lancamento.conta_id) {
+    contaLancamento.value = String(lancamento.conta_id);
+  }
+
+  document.querySelector("#descricao-lancamento").value = lancamento.descricao || "";
+  document.querySelector("#valor-lancamento").value = formatarMoeda(lancamento.valor).replace("R$", "").trim();
+  document.querySelector("#data-lancamento").value = lancamento.data_movimentacao || "";
+  document.querySelector("#observacao-lancamento").value = lancamento.observacao || "";
+
+  if (botaoSalvarLancamento) {
+    botaoSalvarLancamento.textContent = "Salvar alterações";
+  }
+  if (botaoCancelarEdicaoLancamento) {
+    botaoCancelarEdicaoLancamento.hidden = false;
+  }
+
+  formLancamento.scrollIntoView({ behavior: "smooth", block: "center" });
+  mostrarMensagemLancamento("Editando lançamento selecionado.", "sucesso");
+}
+
+if (botaoCancelarEdicaoLancamento) {
+  botaoCancelarEdicaoLancamento.addEventListener("click", () => {
+    limparFormularioLancamento();
+    limparMensagemLancamento();
+  });
+}
+
+if (listaLancamentos) {
+  listaLancamentos.addEventListener("click", async (evento) => {
+    const botaoEditar = evento.target.closest(".botao-editar-lancamento");
+    if (!botaoEditar) return;
+    const id = Number(botaoEditar.dataset.id);
+    try {
+      const lancamentos = await requisicaoApi("/api/lancamentos?limite=200");
+      const lancamento = lancamentos.find((l) => Number(l.id) === id);
+      if (lancamento) {
+        await preencherFormularioLancamento(lancamento);
+      }
+    } catch (erro) {
+      console.error("Erro ao carregar dados do lançamento para edição:", erro);
+      mostrarMensagemDashboard(erro.message, "erro");
+    }
+  });
 }
 
 

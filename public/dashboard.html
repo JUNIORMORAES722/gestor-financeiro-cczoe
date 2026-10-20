@@ -419,6 +419,15 @@
             Salvar lançamento
           </button>
 
+          <button
+            id="botao-cancelar-edicao-lancamento"
+            class="botao-secundario"
+            type="button"
+            hidden
+          >
+            Cancelar edição
+          </button>
+
           <p
             id="mensagem-lancamento"
             class="mensagem-formulario"
@@ -458,13 +467,15 @@
               <th>Categoria</th>
               <th>Data</th>
               <th>Conta</th>
+              <th>Responsável</th>
+              <th>Ações</th>
             </tr>
           </thead>
 
           <tbody id="lista-lancamentos">
             <tr>
               <td
-                colspan="7"
+                colspan="9"
                 class="tabela-vazia"
               >
                 Carregando lançamentos...

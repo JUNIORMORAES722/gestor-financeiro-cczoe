@@ -690,48 +690,74 @@ p {
    ========================================================================== */
 
 .tabela-recentes {
-  width: 1180px;
-  min-width: 1180px;
+  width: 100%;
+  min-width: 100%;
+  table-layout: auto;
+}
+
+.tabela-recentes th,
+.tabela-recentes td {
+  padding: 12px 8px;
+  height: auto;
+  font-size: 13px;
+  word-break: normal;
+}
+
+.tabela-recentes th {
+  padding: 14px 8px;
+  font-size: 11px;
 }
 
 .tabela-recentes th:nth-child(1),
 .tabela-recentes td:nth-child(1) {
-  width: 125px;
-}
-
-.tabela-recentes th:nth-child(2),
-.tabela-recentes td:nth-child(2) {
-  width: 210px;
+  width: 85px;
+  text-align: center;
+  white-space: nowrap;
 }
 
 .tabela-recentes th:nth-child(3),
 .tabela-recentes td:nth-child(3) {
-  width: 155px;
-  text-align: center;
-}
-
-.tabela-recentes th:nth-child(4),
-.tabela-recentes td:nth-child(4) {
-  width: 190px;
-}
-
-.tabela-recentes th:nth-child(5),
-.tabela-recentes td:nth-child(5) {
-  width: 180px;
+  text-align: right;
+  white-space: nowrap;
 }
 
 .tabela-recentes th:nth-child(6),
 .tabela-recentes td:nth-child(6) {
-  width: 140px;
-}
-
-.tabela-recentes th:nth-child(7),
-.tabela-recentes td:nth-child(7) {
-  width: 180px;
-}
-
-.tabela-recentes .valor-tabela {
+  width: 95px;
+  white-space: nowrap;
   text-align: center;
+}
+
+.tabela-recentes th:nth-child(8),
+.tabela-recentes td:nth-child(8) {
+  font-size: 12px;
+}
+
+.tabela-recentes th:nth-child(9),
+.tabela-recentes td:nth-child(9) {
+  width: 80px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.botao-editar-lancamento {
+  border: 1px solid #bcb8ea !important;
+  color: var(--cor-primaria) !important;
+  background: #f4f2ff !important;
+  padding: 6px 14px !important;
+  border-radius: 8px;
+  font-weight: 800;
+  font-size: 12px;
+  cursor: pointer;
+  display: inline-block;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.botao-editar-lancamento:hover {
+  background: #e5e2ff !important;
+  border-color: var(--cor-primaria) !important;
+  transform: translateY(-1px);
 }
 
 
@@ -1351,10 +1377,7 @@ p {
   esta regra não substitui a correção do JavaScript, mas impede
   que ela apareça visualmente na tabela de lançamentos recentes.
 */
-.tabela-recentes th:nth-child(8),
-.tabela-recentes td:nth-child(8) {
-  display: none;
-}
+/* Regra de ocultar coluna removida para exibir Responsável e Ações */
 
 
 /* ==========================================================================
@@ -1452,5 +1475,100 @@ p {
   @page {
     size: A4 landscape; /* Define o tamanho da página como A4 e orientação paisagem */
     margin: 12mm; /* Margens de 12mm em todos os lados */
+  }
+}
+
+/* Responsividade para telas de Tablet e Celular (Lançamentos Recentes em Cards) */
+@media (max-width: 860px) {
+  .tabela-recentes,
+  .tabela-recentes thead,
+  .tabela-recentes tbody,
+  .tabela-recentes th,
+  .tabela-recentes td,
+  .tabela-recentes tr {
+    display: block;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+
+  .tabela-recentes thead tr {
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .tabela-recentes tbody tr {
+    margin-bottom: 18px;
+    padding: 16px 18px;
+    border: 1px solid var(--cor-borda);
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow: 0 4px 14px rgba(39, 35, 100, 0.05);
+  }
+
+  .tabela-recentes td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 9px 0 !important;
+    height: auto !important;
+    min-height: 0 !important;
+    border-bottom: 1px solid #f1f2f7;
+    font-size: 13px;
+    text-align: right;
+  }
+
+  .tabela-recentes td strong {
+    text-align: right;
+  }
+
+  .tabela-recentes td::before {
+    content: attr(data-label);
+    font-weight: 800;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #6c6d7e;
+    text-align: left;
+    margin-right: 12px;
+    flex-shrink: 0;
+  }
+
+  .tabela-recentes td:last-child {
+    border-bottom: 0;
+    padding-top: 14px !important;
+    padding-bottom: 0 !important;
+    justify-content: stretch;
+  }
+
+  .tabela-recentes td.acoes-tabela::before {
+    display: none;
+  }
+
+  .tabela-recentes .acoes-tabela {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .tabela-recentes .botao-editar-lancamento {
+    width: 100%;
+    text-align: center;
+    padding: 11px 16px !important;
+    font-size: 13px;
+    border-radius: 10px;
+  }
+
+  .tabela-recentes td.tabela-vazia {
+    display: block;
+    text-align: center;
+    justify-content: center;
+    border-bottom: 0;
+  }
+
+  .tabela-recentes td.tabela-vazia::before {
+    display: none;
   }
 }
